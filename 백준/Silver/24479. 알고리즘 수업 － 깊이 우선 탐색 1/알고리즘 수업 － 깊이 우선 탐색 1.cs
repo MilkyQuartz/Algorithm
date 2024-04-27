@@ -1,56 +1,81 @@
-StreamReader sr = new StreamReader(Console.OpenStandardInput());
-StreamWriter sw = new StreamWriter(Console.OpenStandardOutput());
+using System;
 
-string[] input = sr.ReadLine().Split();
-int N = int.Parse(input[0]);
-int M = int.Parse(input[1]);
-int R = int.Parse(input[2]);
-
-// 각 정점의 방문 여부를 저장하는 배열
-bool[] visited = new bool[N + 1];
-// 각 정점의 방문 순서를 저장하는 배열
-int[] order = new int[N + 1];
-// 각 정점의 인접 정점 리스트를 저장하는 리스트 배열
-List<int>[] graph = new List<int>[N + 1];
-
-for (int i = 1; i <= N; i++)
+namespace Baekjoon
 {
-    graph[i] = new List<int>();
-}
 
-for (int i = 0; i < M; i++)
-{
-    string[] edge = sr.ReadLine().Split();
-    int u = int.Parse(edge[0]);
-    int v = int.Parse(edge[1]);
-    graph[u].Add(v);
-    graph[v].Add(u);
-}
-
-int count = 1;
-
-DFS(graph, R, visited, order, ref count);
-
-for (int i = 1; i <= N; i++)
-{
-    sw.WriteLine(visited[i] ? order[i] : 0);
-}
-
-sw.Flush();
-sw.Close();
-sr.Close();
-
-void DFS(List<int>[] graph, int v, bool[] visited, int[] order, ref int count)
-{
-    visited[v] = true;
-    order[v] = count++;
-
-    // 인접 정점을 오름차순으로 방문
-    foreach (int u in graph[v].OrderBy(x => x))
+    class Program
     {
-        if (!visited[u])
+        static StreamReader sr = new StreamReader(new BufferedStream(Console.OpenStandardInput()));
+        static StreamWriter sw = new StreamWriter(new BufferedStream(Console.OpenStandardOutput()));
+
+        static int N, M, R;
+        static List<int>[] graph;
+        static int[] order;
+        static bool[] visited;
+        static int visitorder = 1;
+
+        static void Main()
         {
-            DFS(graph, u, visited, order, ref count);
+            string[] inputs = sr.ReadLine().Split(" ");
+            N = int.Parse(inputs[0]);
+            M = int.Parse(inputs[1]);
+            R = int.Parse(inputs[2]);
+
+            graph = new List<int>[N + 1]; 
+            for (int i = 0; i <= N; ++i)
+            {
+                graph[i] = new List<int>();
+            }
+
+            for (int i = 0; i < M; ++i)
+            {
+                inputs = sr.ReadLine().Split(" ");
+
+                int u = int.Parse(inputs[0]);
+                int v = int.Parse(inputs[1]);
+                graph[u].Add(v);
+                graph[v].Add(u);
+            }
+
+            for (int i = 1; i <= N; ++i)
+            {
+                graph[i].Sort();
+            }
+
+            order = new int[N + 1];
+            visited = new bool[N + 1];
+            dfs(R);
+
+            for (int i = 1; i <= N; ++i)
+            {
+                sw.WriteLine(order[i]);
+            }
+
+            sr.Close();
+            sw.Close();
+
         }
+
+        static void dfs(int node)
+        {
+            if (visited[node])
+            {
+                return;
+            }
+
+            visited[node] = true;
+
+            order[node] = visitorder;
+            ++visitorder;
+
+            foreach (int next in graph[node])
+            {
+                if (visited[next] == false)
+                {
+                    dfs(next);
+                }
+            }
+        }
+
     }
 }
