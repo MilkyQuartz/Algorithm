@@ -1,38 +1,32 @@
 class Program
 {
+    static int n;
+    static int[,] graph;
+    static List<int> num = new List<int>();
     static int[] dx = { 0, 0, 1, -1 };
     static int[] dy = { 1, -1, 0, 0 };
+    static int count = 0;
 
-    static int BFS(int[,] graph, int a, int b)
+    static bool DFS(int x, int y)
     {
-        int n = graph.GetLength(0);
-        LinkedList<Tuple<int, int>> group = new LinkedList<Tuple<int, int>>();
-        group.AddLast(new Tuple<int, int>(a, b));
-        graph[a, b] = 0;
-        int count = 1;
-
-        while (group.Count > 0)
+        if (x < 0 || x >= n || y < 0 || y >= n)
         {
-            var node = group.First;
-            var (x, y) = node.Value;
-            group.RemoveFirst();
+            return false;
+        }
+
+        if (graph[x, y] == 1)
+        {
+            count += 1;
+            graph[x, y] = 0;
             for (int i = 0; i < 4; i++)
             {
                 int nx = x + dx[i];
                 int ny = y + dy[i];
-                if (nx < 0 || nx >= n || ny < 0 || ny >= n)
-                {
-                    continue;
-                }
-                if (graph[nx, ny] == 1)
-                {
-                    graph[nx, ny] = 0;
-                    group.AddLast(new Tuple<int, int>(nx, ny));
-                    count += 1;
-                }
+                DFS(nx, ny);
             }
+            return true;
         }
-        return count;
+        return false;
     }
 
     static void Main(string[] args)
@@ -40,8 +34,8 @@ class Program
         StreamReader sr = new StreamReader(Console.OpenStandardInput());
         StreamWriter sw = new StreamWriter(Console.OpenStandardOutput());
 
-        int n = int.Parse(sr.ReadLine());
-        int[,] graph = new int[n, n];
+        n = int.Parse(sr.ReadLine());
+        graph = new int[n, n];
 
         for (int i = 0; i < n; i++)
         {
@@ -52,23 +46,26 @@ class Program
             }
         }
 
-        List<int> cnt = new List<int>();
+        int result = 0;
+
         for (int i = 0; i < n; i++)
         {
             for (int j = 0; j < n; j++)
             {
-                if (graph[i, j] == 1)
+                if (DFS(i, j))
                 {
-                    cnt.Add(BFS(graph, i, j));
+                    num.Add(count);
+                    result += 1;
+                    count = 0;
                 }
             }
         }
 
-        cnt.Sort();
-        sw.WriteLine(cnt.Count);
-        foreach (int count in cnt)
+        num.Sort();
+        sw.WriteLine(result);
+        foreach (int number in num)
         {
-            sw.WriteLine(count);
+            sw.WriteLine(number);
         }
 
         sw.Flush();
