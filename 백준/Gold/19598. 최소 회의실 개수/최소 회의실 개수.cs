@@ -1,59 +1,40 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-
-public class P_19598
+namespace ConsoleApp1
 {
-    static int N;
-    static PriorityQueue<Time, int> pq;
-
-    public static void Main(string[] args)
+    internal class Program
     {
-        N = int.Parse(Console.ReadLine());
-        pq = new PriorityQueue<Time, int>(Comparer<int>.Default);
-
-        for (int i = 0; i < N; i++)
+        public static void Main(string[] args)
         {
-            string[] input = Console.ReadLine().Split();
-            pq.Enqueue(new Time(int.Parse(input[0]), true), int.Parse(input[0]));  // 시작시간
-            pq.Enqueue(new Time(int.Parse(input[1]), false), int.Parse(input[1])); // 종료시간
-        }
-
-        int cnt = 0; // 회의실 개수
-        int answer = 0; // 최대값
-
-        while (pq.Count > 0)
-        {
-            Time t = pq.Dequeue();
-
-            if (t.isStart)
+            StreamReader input = new StreamReader(
+                new BufferedStream(Console.OpenStandardInput()));
+            StreamWriter output = new StreamWriter(
+                new BufferedStream(Console.OpenStandardOutput()));
+            int n = int.Parse(input.ReadLine());
+            PriorityQueue<int, int> pq = new();
+            List<(int, int)> c = new();
+            for (int i = 0; i < n; i++)
             {
-                cnt++;
-                answer = Math.Max(cnt, answer);
+                int[] temp = Array.ConvertAll(input.ReadLine().Split(' '), int.Parse);
+                c.Add((temp[0], temp[1]));
             }
-            else
+            c.Sort();
+            pq.Enqueue(c[0].Item2, c[0].Item2);
+            for (int i = 1; i < c.Count; i++)
             {
-                cnt--;
+                if (c[i].Item1 < pq.Peek())
+                {
+                    pq.Enqueue(c[i].Item2, c[i].Item2);
+                }
+                else
+                {
+                    pq.Dequeue();
+                    pq.Enqueue(c[i].Item2, c[i].Item2);
+                }
             }
-        }
 
-        Console.Write(answer);
-    }
+            output.Write(pq.Count);
 
-    public class Time : IComparable<Time>
-    {
-        public int time;
-        public bool isStart;
-
-        public Time(int time, bool isStart)
-        {
-            this.time = time;
-            this.isStart = isStart;
-        }
-
-        public int CompareTo(Time other)
-        {
-            return this.time - other.time;
+            input.Close();
+            output.Close();
         }
     }
 }
