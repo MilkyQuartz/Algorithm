@@ -7,9 +7,9 @@ int n = int.Parse(Console.ReadLine());
 for (int i = 0; i < n; i++)
 {
     int[] input = Console.ReadLine().Split().Select(int.Parse).ToArray();
-    int[] reInput = input.OrderByDescending(x => x).ToArray();
+    Array.Sort(input);
 
-    sb.AppendLine($"{reInput[2]}");
+    sb.AppendLine($"{input[input.Length-3]}");
 }
 
 Console.Write(sb.ToString());
